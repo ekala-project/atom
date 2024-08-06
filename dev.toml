@@ -1,9 +1,6 @@
 [project]
 name = "dev-tools"
 
-[lib]
-path = "dev"
-
 [fetch.pkgs]
 name = "nixpkgs"
 import = true
@@ -20,3 +17,47 @@ fetcher = "npins"
 
 [fetcher.npins]
 root = "npins"
+
+[lib]
+path = "dev"
+
+### DRAFT: output types
+
+## plugins can define "output types" specced below
+## which are useful for grouping functionality
+
+# the first path is special and signifies a high-level output type
+# dev: devshells (`dev.shell` refers to `atom.shell`)
+[[dev.shell]]
+matrix = [
+  "{x86_64-linux,x86_64-darwin}",
+  # AS:
+  # "x86_64-linux,
+  # "x86_64-darwin",
+]
+
+# pkg: packages
+[[pkg.my.awesome.package]]
+# Build:?Host:?Target:?{*}
+matrix = [
+  "x86_64-linux:{static,musl}:{store,deb,oci}",
+  # expansion
+  "x86_64-linux:{aarch64-linux,riscv64-linux}:{gnu,musl,libc}:{static, dyn}",
+
+  # {^build|host|target} from immediately above
+  # {*}: repeats the list immediately preceeding it
+  "{^host}:{*}:static" # {aarch64-linux,riscv64-linux}:{aarch64-linux,riscv64-linux}:static
+]
+
+# specify in reverse to disable
+sparse = [
+  # disable the static gnu builds for both host architectures
+  "static:gnu:*"
+
+]
+
+# host: nixos machines
+[[host.path.to.chart]]
+
+# fleet: deployments
+[[fleet.prod.gateway]]
