@@ -21,6 +21,6 @@ fetcher = "npins"
 # for the Nix std library
 __is_std__ = true
 
+# all features of std.toml are builtin features
 [features]
-pkg_lib = ["lib"]
-default = []
+std = [] # can have pkg_lib

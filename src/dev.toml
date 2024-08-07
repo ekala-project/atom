@@ -6,8 +6,6 @@ name = "nixpkgs"
 import = true
 args = [{}]
 
-[core]
-features = ["std"]
 [std]
 features = ["pkg_lib"]
 

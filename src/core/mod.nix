@@ -15,8 +15,6 @@ let
     std = builtins;
     mod = scopedImport { inherit std mod; } ../std/string/mod.nix;
   } ../std/string/toLowerCase.nix;
-  stdToml = l.fromTOML (l.readFile ../std.toml);
-  coreToml = l.fromTOML (l.readFile ../core.toml);
 in
 rec {
   inherit
@@ -24,8 +22,7 @@ rec {
     filterMap
     strToPath
     stdFilter
-    stdToml
-    coreToml
+    fromManifest
     ;
 
   file = {
@@ -59,8 +56,6 @@ rec {
     (type == "regular" && file.ext or null != "nix")
     || (type == "directory" && !l.pathExists "${path}/mod.nix")
   );
-
-  readStd = opts: fromManifest { inherit (opts) __internal__test features; };
 
   modIsValid =
     mod: dir:

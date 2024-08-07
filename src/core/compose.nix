@@ -6,9 +6,6 @@ in
   config,
   extern ? { },
   features ? [ ],
-  # internal features of the composer function
-  stdFeatures ? src.stdToml.features.default or [ ],
-  coreFeatures ? src.coreToml.features.default,
   # enable testing code paths
   __internal__test ? false,
   __isStd__ ? false,
@@ -17,21 +14,11 @@ dir':
 let
   dir = src.prepDir dir';
 
-  std = src.readStd {
-    features = stdFeatures;
-    inherit __internal__test;
-  } ../std.toml;
-
-  coreFeatures' = src.features.resolve src.coreToml.features coreFeatures;
-  stdFeatures' = src.features.resolve src.stdToml.features stdFeatures;
+  std = src.fromManifest { inherit features __internal__test; } ../std.toml;
 
   __atom = config // {
     features = config.features or { } // {
-      resolved = {
-        atom = features;
-        compose = coreFeatures';
-        std = stdFeatures';
-      };
+      __resolved = features;
     };
   };
 
@@ -65,7 +52,7 @@ let
           scope'' = src.set.inject scope' [
             preOpt
             {
-              _if = !__isStd__ && l.elem "std" coreFeatures';
+              _if = !__isStd__ && l.elem "std" features;
               inherit std;
             }
             {
@@ -145,7 +132,7 @@ let
         }
       )
       {
-        _if = __isStd__ && l.elem "pkg_lib" __atom.features.resolved.atom;
+        _if = __isStd__ && l.elem "pkg_lib" __atom.features.__resolved;
         inherit (extern) lib;
       }
       {

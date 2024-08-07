@@ -3,6 +3,10 @@ name = "core"
 version = "0.3.0"
 description = "A purpose built, unopinionated, and performant module system for Nix code."
 
+[atom.meta]
+# special attribute for the core
+__root_features__ = ["core"]
+
+# all features of atom.toml are builtin features
 [features]
-std = []
-default = ["std"]
+core = ["std"]

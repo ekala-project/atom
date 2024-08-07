@@ -1,5 +1,7 @@
 let
   l = builtins;
+  stdToml = l.fromTOML (l.readFile ../std.toml);
+  coreToml = l.fromTOML (l.readFile ../core.toml);
 in
 {
   /**
@@ -62,4 +64,8 @@ in
       resolved = resolve initials { };
     in
     l.attrNames resolved;
+
+  addBuiltins = featureSet: coreToml.features // stdToml.features // featureSet;
+  addRootFeatures = features: features ++ coreToml.atom.meta.__root_features__;
 }
+

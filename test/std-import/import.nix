@@ -5,5 +5,5 @@ in
   default = f ./default.toml;
   noStd = f ./no-std.toml;
   explicit = f ./explicit.toml;
-  withNixpkgsLib = f ./pkglib.toml;
+  withPkgLib = f ./pkglib.toml;
 }

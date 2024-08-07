@@ -13,13 +13,19 @@ let
   atom = config.atom or { };
   name = atom.name or (mod.errors.missingName path);
 
-  core = config.core or { };
-  std = config.std or { };
+  core = config.core or null;
+  std = config.std or null;
 
   features' =
     let
-      featSet = config.features or { };
-      featIn = if features == null then featSet.default or [ ] else features;
+      featSet = mod.features.addBuiltins (config.features or { } // (
+        if core != null then {inherit core;} else {}
+      ) // (
+        if std != null then {inherit std;} else {}
+      ));
+      featIn = mod.features.addRootFeatures (
+        if features == null then featSet.default or [ ] else features
+      );
     in
     mod.features.resolve featSet featIn;
 
@@ -63,16 +69,5 @@ in
 (mod.compose) {
   inherit extern __internal__test config;
   features = features';
-  coreFeatures =
-    let
-      feat = core.features or mod.coreToml.features.default;
-    in
-    mod.features.resolve mod.coreToml.features feat;
-  stdFeatures =
-    let
-      feat = std.features or mod.stdToml.features.default;
-    in
-    mod.features.resolve mod.stdToml.features feat;
-
   __isStd__ = meta.__is_std__ or false;
 } (dirOf path + "/${root}")

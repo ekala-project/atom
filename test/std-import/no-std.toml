@@ -3,4 +3,4 @@ name = "test"
 path = "import"
 
 [core]
-features = [] # defualt is ["std"]
+features = [] # default is ["std"]
