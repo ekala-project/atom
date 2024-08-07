@@ -1,0 +1,41 @@
+root: ./
+
+structure:
+  readme: README.md
+  summary: SUMMARY.md
+
+redirects:
+  core-concepts/what-is-atom: WIP.md
+  core-concepts/atoms-and-modules: WIP.md
+  core-concepts/lazy-evaluation-and-purity: WIP.md
+  core-concepts/dependency-management: WIP.md
+  getting-started/installation: WIP.md
+  getting-started/your-first-atom: WIP.md
+  getting-started/atom-composition: WIP.md
+  atom-structure/manifest-file: WIP.md
+  atom-structure/module-structure: WIP.md
+  atom-structure/public-and-private-interfaces: WIP.md
+  advanced-usage/mono-repo-management: WIP.md
+  advanced-usage/remote-dependencies: WIP.md
+  advanced-usage/vendoring: WIP.md
+  advanced-usage/static-analysis: WIP.md
+  best-practices/code-organization: WIP.md
+  best-practices/dependency-management: WIP.md
+  best-practices/performance-optimization: WIP.md
+  tooling/cli-tools: WIP.md
+  tooling/editor-integration: WIP.md
+  tooling/ci-cd-integration: WIP.md
+  api-reference/core-functions: WIP.md
+  api-reference/utility-functions: WIP.md
+  tutorials/building-nixos-configuration: WIP.md
+  tutorials/creating-reusable-library: WIP.md
+  tutorials/managing-large-project: WIP.md
+  migration-guides/from-nix-flakes: WIP.md
+  migration-guides/from-traditional-nix: WIP.md
+  community-and-support/contributing: WIP.md
+  community-and-support/reporting-issues: WIP.md
+  community-and-support/community-resources: WIP.md
+  faq/general-questions: WIP.md
+  faq/technical-questions: WIP.md
+  appendix/glossary: WIP.md
+  appendix/comparison: WIP.md
