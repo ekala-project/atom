@@ -11,6 +11,7 @@ let
   file = builtins.readFile path;
   config = builtins.fromTOML file;
   atom = config.atom or { };
+  src = config.src or { };
   name = atom.name or (mod.errors.missingName path);
 
   features' =
@@ -25,9 +26,9 @@ let
   compose = config.compose or { };
 
   root = atom.path or name;
-  extern =
+  fetches =
     let
-      fetcher = nix.fetcher or "native"; # native doesn't exist yet
+      fetcher = nix.fetcher or "native"; # TODO: native doesn't exist yet
       conf = config.fetcher or { };
       f = conf.${fetcher} or { };
       root = f.root or "npins";
@@ -54,6 +55,22 @@ let
     # else if fetcher = "native", etc
     else
       { };
+
+  srcs =
+    let
+      filter = scopedImport {
+        std = builtins // {
+          string.split = import ../std/string/split.nix;
+        };
+      } ../std/path/filter.nix;
+    in
+    mod.filterMap (
+      name: paths: if builtins.isList paths != true then null else filter paths (dirOf path)
+    ) src;
+
+  extern = fetches // {
+    src = srcs;
+  };
 
   meta = atom.meta or { };
 

@@ -51,14 +51,22 @@ rec {
     if s == k then null else { ${s} = v; }
   );
 
-  rmNixSrcs = l.filterSource (
-    path: type:
+  rmNixSrcs =
+    path:
     let
-      file = parse (baseNameOf path);
+      name = baseNameOf path;
     in
-    (type == "regular" && file.ext or null != "nix")
-    || (type == "directory" && !l.pathExists "${path}/mod.nix")
-  );
+    l.path {
+      inherit name path;
+      filter = (
+        path: type:
+        let
+          file = parse name;
+        in
+        (type == "regular" && file.ext or null != "nix")
+        || (type == "directory" && !l.pathExists "${path}/mod.nix")
+      );
+    };
 
   readStd = opts: fromManifest { inherit (opts) __internal__test features; };
 
