@@ -5,7 +5,6 @@ structure:
   summary: SUMMARY.md
 
 redirects:
-  core-concepts/what-is-atom: WIP.md
   core-concepts/atoms-and-modules: WIP.md
   core-concepts/lazy-evaluation-and-purity: WIP.md
   core-concepts/dependency-management: WIP.md
