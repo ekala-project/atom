@@ -1,8 +1,7 @@
 {
-  upperChars = mod.stringToChars "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  lowerChars = mod.stringToChars "abcdefghijklmnopqrstuvwxyz";
+  Escape = mod.escape;
 
-  stringToChars = s: std.genList (p: std.substring p 1 s) (std.stringLength s);
+  Chars = s: std.genList (p: std.substring p 1 s) (std.stringLength s);
 
   Split = mod.split;
 
@@ -33,4 +32,7 @@
   ToLower = std.replaceStrings mod.upperChars mod.lowerChars;
 
   ToLowerCase = mod.toLowerCase;
+
+  upperChars = mod.chars or mod.Chars "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  lowerChars = mod.chars or mod.Chars "abcdefghijklmnopqrstuvwxyz";
 }

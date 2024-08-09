@@ -29,10 +29,8 @@
 
   :::
 */
-sep: s:
+sep: str:
 let
-  addContextFrom = src: target: std.substring 0 0 src + target;
-
-  splits = std.filter std.isString (std.split (mod.escapeRegex (toString sep)) (toString s));
+  p = std.split (pre.regex.escape (toString sep)) (toString str);
 in
-map (addContextFrom s) splits
+std.filter (x: std.typeOf x == "string" && x != "") p

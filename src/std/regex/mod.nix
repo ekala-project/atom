@@ -1,0 +1,1 @@
+{ Escape = mod.escape; }
