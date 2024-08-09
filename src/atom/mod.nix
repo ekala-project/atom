@@ -94,7 +94,7 @@ rec {
     dir:
     let
       dir' =
-        if l.match "^/nix/store/.+" dir != null then
+        if l.match "^${l.storeDir}/.+" dir != null then
           # this is safe because we will never reimport the full path back to the store
           # only specific files within it, which will have their own context when converted
           # back to a string.

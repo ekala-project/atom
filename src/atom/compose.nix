@@ -96,13 +96,15 @@ let
       g =
         name: type:
         let
-          path = dir + "/${name}";
+          path = src.path.make dir name;
           file = src.file.parse name;
+          member = l.path { inherit path name; };
+          module = src.path.make path "mod.nix";
         in
-        if type == "directory" && l.pathExists "${toString path}/mod.nix" then
+        if type == "directory" && l.pathExists module then
           { ${name} = f ((src.lowerKeys self) // src.set.when preOpt) path; }
         else if type == "regular" && file.ext or null == "nix" && name != "mod.nix" then
-          { ${file.name} = Import "${path}"; }
+          { ${file.name} = Import member; }
         else
           null # Ignore other file types
       ;
@@ -111,7 +113,12 @@ let
 
       self =
         let
-          mod = Import "${dir + "/mod.nix"}";
+          path = src.path.make dir "mod.nix";
+          module = l.path {
+            inherit path;
+            name = baseNameOf path;
+          };
+          mod = Import module;
         in
         assert src.modIsValid mod dir;
         src.filterMap g contents // mod;
