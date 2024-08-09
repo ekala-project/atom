@@ -11,7 +11,7 @@
   # Type
 
   ```
-  parse :: String -> AttrSet | Null
+  parse :: String -> AttrSet
   ```
 
   # Parameters
@@ -20,17 +20,33 @@
 
   # Return Value
 
-  An attribute set with `name` and `ext` attributes, or `null` if the string cannot be parsed.
+  An attribute set with the file `name` and an optional `ext` attribute representing the extension, if one exists.
 */
 
 str:
 let
-  r = std.match "([^.]+)\\.(.+)" (baseNameOf str);
+  s = x: std.isString x || std.isPath x || x ? outPath || x ? __toString;
+  l = std.length r;
+  r = std.match "(\\.*[^.]+)\\.?(.+)?" (baseNameOf str);
+
+  isnt = !s str;
+
+  name = std.head r;
+  ext = std.elemAt r 1;
+  f =
+    if isnt || r == null then
+      throw ''
+        in std.file.parse:
+
+               expected:
+                 - str: path or string representing a file name
+
+               got:
+                 - str: ${if isnt then "a ${std.typeOf str}" else str}
+      ''
+    else if l >= 2 && ext != null then
+      { inherit name ext; }
+    else
+      { inherit name; };
 in
-if r == null || std.length r < 2 then
-  null
-else
-  {
-    name = std.head r;
-    ext = std.elemAt r 1;
-  }
+std.addErrorContext "in call to std.file.parse" f

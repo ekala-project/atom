@@ -4,6 +4,8 @@
 
   stringToChars = s: std.genList (p: std.substring p 1 s) (std.stringLength s);
 
+  Split = mod.split;
+
   /**
     Convert a string to lowercase by replacing all uppercase characters with their lowercase equivalents.
 

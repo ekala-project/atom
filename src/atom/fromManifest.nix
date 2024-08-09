@@ -60,7 +60,7 @@ let
     let
       filter = scopedImport {
         std = builtins // {
-          string.split = import ../std/string/split.nix;
+          string.split = scopedImport { std = builtins; } ../std/string/split.nix;
         };
       } ../std/path/filter.nix;
     in

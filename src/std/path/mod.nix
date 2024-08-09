@@ -1,1 +1,4 @@
-{ StrToPath = mod.strToPath; }
+{
+  Make = mod.make;
+  Filter = mod.filter;
+}
