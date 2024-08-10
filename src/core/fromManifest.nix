@@ -13,6 +13,9 @@ let
   atom = config.atom or { };
   name = atom.name or (mod.errors.missingName path);
 
+  core = config.core or { };
+  std = config.std or { };
+
   features' =
     let
       featSet = config.features or { };
@@ -22,7 +25,6 @@ let
 
   backend = config.backend or { };
   nix = backend.nix or { };
-  compose = config.compose or { };
 
   root = atom.path or name;
   extern =
@@ -57,19 +59,18 @@ let
 
   meta = atom.meta or { };
 
-  coreFeatures = compose.features or { };
 in
 (mod.compose) {
   inherit extern __internal__test config;
   features = features';
   coreFeatures =
     let
-      feat = coreFeatures.core or mod.coreToml.features.default;
+      feat = core.features or mod.coreToml.features.default;
     in
     mod.features.resolve mod.coreToml.features feat;
   stdFeatures =
     let
-      feat = coreFeatures.std or mod.stdToml.features.default;
+      feat = std.features or mod.stdToml.features.default;
     in
     mod.features.resolve mod.stdToml.features feat;
 

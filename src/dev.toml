@@ -6,9 +6,10 @@ name = "nixpkgs"
 import = true
 args = [{}]
 
-[compose.features]
-core = ["std"]
-std = ["pkg_lib"]
+[core]
+features = ["std"]
+[std]
+features = ["pkg_lib"]
 
 [backend.nix]
 # default when `eka` cli is ready

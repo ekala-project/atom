@@ -2,5 +2,5 @@
 name = "test"
 path = "import"
 
-[compose.features]
-std = ["pkg_lib"]
+[std]
+features = ["pkg_lib"]
