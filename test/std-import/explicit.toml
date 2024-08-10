@@ -3,5 +3,5 @@ name = "test"
 path = "import"
 
 [composer.features]
-atom = ["std"]
+core = ["std"]
 std = []

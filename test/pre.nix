@@ -1,1 +1,1 @@
-(import ../src/atom/fromManifest.nix { }) ./pre.toml
+(import ../src/core/fromManifest.nix { }) ./pre.toml

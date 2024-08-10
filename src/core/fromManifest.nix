@@ -57,19 +57,19 @@ let
 
   meta = atom.meta or { };
 
-  composeFeatures = compose.features or { };
+  coreFeatures = compose.features or { };
 in
 (mod.compose) {
   inherit extern __internal__test config;
   features = features';
-  composeFeatures =
+  coreFeatures =
     let
-      feat = composeFeatures.atom or mod.atomToml.features.default;
+      feat = coreFeatures.core or mod.coreToml.features.default;
     in
-    mod.features.resolve mod.atomToml.features feat;
+    mod.features.resolve mod.coreToml.features feat;
   stdFeatures =
     let
-      feat = composeFeatures.std or mod.stdToml.features.default;
+      feat = coreFeatures.std or mod.stdToml.features.default;
     in
     mod.features.resolve mod.stdToml.features feat;
 

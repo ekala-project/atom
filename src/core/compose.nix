@@ -8,7 +8,7 @@ in
   features ? [ ],
   # internal features of the composer function
   stdFeatures ? src.stdToml.features.default or [ ],
-  composeFeatures ? src.atomToml.features.default,
+  coreFeatures ? src.coreToml.features.default,
   # enable testing code paths
   __internal__test ? false,
   __isStd__ ? false,
@@ -22,14 +22,14 @@ let
     inherit __internal__test;
   } ../std.toml;
 
-  composeFeatures' = src.features.resolve src.atomToml.features composeFeatures;
+  coreFeatures' = src.features.resolve src.coreToml.features coreFeatures;
   stdFeatures' = src.features.resolve src.stdToml.features stdFeatures;
 
   __atom = config // {
     features = config.features or { } // {
       resolved = {
         atom = features;
-        compose = composeFeatures';
+        compose = coreFeatures';
         std = stdFeatures';
       };
     };
@@ -65,7 +65,7 @@ let
           scope'' = src.set.inject scope' [
             preOpt
             {
-              _if = !__isStd__ && l.elem "std" composeFeatures';
+              _if = !__isStd__ && l.elem "std" coreFeatures';
               inherit std;
             }
             {

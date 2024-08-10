@@ -16,7 +16,7 @@ let
     mod = scopedImport { inherit std mod; } ../std/string/mod.nix;
   } ../std/string/toLowerCase.nix;
   stdToml = l.fromTOML (l.readFile ../std.toml);
-  atomToml = l.fromTOML (l.readFile ../atom.toml);
+  coreToml = l.fromTOML (l.readFile ../core.toml);
 in
 rec {
   inherit
@@ -25,7 +25,7 @@ rec {
     strToPath
     stdFilter
     stdToml
-    atomToml
+    coreToml
     ;
 
   file = {

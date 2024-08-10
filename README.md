@@ -119,7 +119,7 @@ Exact dependency and composition semantics are still evolving. For updates, see:
 ```nix
 let
   atom = builtins.fetchGit "https://github.com/ekala-project/atom";
-  fromManifest = import "${atom}/src/atom/fromManifest.nix";
+  fromManifest = import "${atom}/src/core/fromManifest.nix";
 in
 fromManifest {
   features = [

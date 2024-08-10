@@ -3,4 +3,4 @@ name = "test"
 path = "import"
 
 [compose.features]
-atom = [] # defualt is ["std"]
+core = [] # defualt is ["std"]
