@@ -12,9 +12,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: nixbuild/nix-quick-install-action@v28
-      - name: Code Format Check
-        run: eval "$(nix print-dev-env -f shell.nix)" && treefmt --fail-on-change
+      - uses: jaxxstorm/action-install-gh-release@v1.10.0
+        with:
+          repo: numtide/treefmt
+      - uses: jaxxstorm/action-install-gh-release@v1.10.0
+        with:
+          repo: nixos/nixfmt
+          extension-matching: disable
+          rename-to: nixfmt
+      - uses: jaxxstorm/action-install-gh-release@v1.10.0
+        with:
+          repo: mvdan/sh
+      - uses: jaxxstorm/action-install-gh-release@v1.10.0
+        with:
+          repo: tamasfe/taplo
+      - uses: jaxxstorm/action-install-gh-release@v1.10.0
+        with:
+          repo: prettier/prettier
+      - run: treefmt --fail-on-change
   std-config:
     runs-on: ubuntu-latest
     steps:
