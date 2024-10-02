@@ -1,5 +1,5 @@
 [atom]
-id = "test"
+id = "no-std-test"
 version = "0.1.0"
 
 [core]

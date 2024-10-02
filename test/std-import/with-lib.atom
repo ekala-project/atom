@@ -1,5 +1,5 @@
 [atom]
-id = "test"
+id = "with-lib-test"
 version = "0.1.0"
 
 [std]

@@ -1,5 +1,5 @@
 [atom]
-id = "test"
+id = "explicit-test"
 version = "0.1.0"
 
 [core]
