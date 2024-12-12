@@ -110,7 +110,7 @@ let
                     shallow = true;
                   };
                 in
-                import repo
+                if dep ? path then import "${repo}/${dep.path}" else import repo
               else
                 { };
           }) lock.deps
