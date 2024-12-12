@@ -32,6 +32,7 @@ rec {
     stdFilter
     stdToml
     coreToml
+    importAtom
     ;
 
   path = {
