@@ -45,6 +45,7 @@ let
   nix = backend.nix or { };
 
   root = mod.prepDir (dirOf path);
+
   src = builtins.seq id (
     let
       file = mod.parse (baseNameOf path);
@@ -52,42 +53,54 @@ let
     in
     builtins.substring 0 (len - 1) file.name
   );
+
   extern =
     let
-      fetcher = nix.fetcher or "native"; # native doesn't exist yet
-      conf = config.fetcher or { };
-      f = conf.${fetcher} or { };
-      root = f.root or "npins";
+      # TODO native doesn't exist yet
+      fetcher = nix.fetcher or "native";
+      throwMissingNativeFetcher = abort "Native fetcher isn't implemented yet";
+
+      fetcherConfig = config.fetcher or { };
+      npinRoot = fetcherConfig.npin.root or "npins";
+      pins = import (dirOf path + "/${npinRoot}");
+
+      fetchEnabledNpinsDep =
+        depName: depConfig:
+        let
+          depIsEnabled =
+            (depConfig.optional or false && builtins.elem depName features') || (!depConfig.optional or false);
+
+          npinSrc = "${pins.${depConfig.name or depName}}/${depConfig.subdir or ""}";
+
+          applyArguments =
+            appliedFunction: nextArgument:
+            let
+              argsFromDeps = depConfig.argsFromDeps or true && builtins.isAttrs nextArgument;
+              argIntersectedwithDeps = nextArgument // (builtins.intersectAttrs nextArgument extern);
+            in
+            if argsFromDeps nextArgument then
+              appliedFunction argIntersectedwithDeps
+            else
+              appliedFunction nextArgument;
+
+          dependency =
+            if depConfig.import or false then
+              if depConfig.args or [ ] != [ ] then
+                builtins.foldl' applyArguments (import npinSrc) depConfig.args
+              else
+                import npinSrc
+            else
+              npinSrc;
+        in
+        if depIsEnabled then { "${depName}" = dependency; } else null;
+
+      npinsDeps = mod.filterMap fetchEnabledNpinsDep config.fetch or { };
+
     in
     if fetcher == "npins" then
-      let
-        pins = import (dirOf path + "/${root}");
-      in
-      mod.filterMap (
-        k: v:
-        let
-          src = "${pins.${v.name or k}}/${v.subdir or ""}";
-          val =
-            if v.import or false then
-              if v.args or [ ] != [ ] then
-                builtins.foldl' (
-                  f: x:
-                  let
-                    intersect = x // (builtins.intersectAttrs x extern);
-                  in
-                  if builtins.isAttrs x then f intersect else f x
-                ) (import src) v.args
-              else
-                import src
-            else
-              src;
-        in
-        if (v.optional or false && builtins.elem k features') || (!v.optional or false) then
-          { "${k}" = val; }
-        else
-          null
-      ) config.fetch or { }
-    # else if fetcher = "native", etc
+      npinsDeps
+    else if fetcher == "native" then
+      throwMissingNativeFetcher
     else
       { };
 
