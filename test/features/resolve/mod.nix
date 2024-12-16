@@ -2,5 +2,5 @@ let
   inherit (__internal) scope;
 in
 {
-  Resolved = __atom.features.resolved.atom;
+  Resolved = cfg.features.resolved.atom;
 }

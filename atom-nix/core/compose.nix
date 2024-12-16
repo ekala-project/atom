@@ -81,7 +81,7 @@ let
   coreFeatures' = core.features.resolve core.coreToml.features coreFeatures;
   stdFeatures' = core.features.resolve core.stdToml.features stdFeatures;
 
-  __atom = config // {
+  cfg = config // {
     features = config.features or { } // {
       resolved = {
         atom = features;
@@ -106,7 +106,7 @@ let
       scope =
         let
           scope' = with core; {
-            inherit __atom;
+            inherit cfg;
             mod = modScope;
             builtins = std;
             import = errors.import;
@@ -118,21 +118,15 @@ let
             __storePath = errors.storePath;
             __getEnv = errors.getEnv "";
             __getFlake = errors.import;
+            get = extern;
+            std = if __isStd__ then atomScope else std;
           };
 
           scope'' = core.set.inject scope' [
             preOpt
             {
-              _if = !__isStd__ && l.elem "std" coreFeatures';
-              inherit std;
-            }
-            {
               _if = !__isStd__;
               atom = atomScope;
-            }
-            {
-              _if = __isStd__;
-              std = l.removeAttrs (extern // atom) [ "std" ];
             }
             {
               _if = __internal__test;
@@ -197,7 +191,7 @@ let
       # Base case: no module
       { };
 
-  atomScope = l.removeAttrs (extern // atom // { inherit extern; }) [
+  atomScope = l.removeAttrs atom [
     "atom"
     (baseNameOf par)
   ];
@@ -209,7 +203,7 @@ let
     core.set.inject fixed [
       ({ _if = __isStd__; } // core.pureBuiltinsForStd fixed)
       {
-        _if = __isStd__ && l.elem "lib" __atom.features.resolved.atom;
+        _if = __isStd__ && l.elem "lib" cfg.features.resolved.atom;
         inherit (extern) lib;
       }
       {

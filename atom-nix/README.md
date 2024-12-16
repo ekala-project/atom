@@ -56,7 +56,7 @@ in
 }
 ```
 
-### `atom`: Top-level and Dependencies
+### `atom`: Top-level public API
 
 ```nix
 # root/mod.nix
@@ -66,11 +66,23 @@ in
 
 # nested/deep/mod.nix
 {
-  UseRoot = x: atom.RootFunc x;
+  UseRoot = x: atom.rootFunc x;
 }
 ```
 
-### `std`: Standard Library
+### `get`: external dependencies specified in the manifest
+
+```nix
+{
+  MyPkg = get.stdenv.mkDerivation {
+    pname = "foo";
+    version = "0.1";
+    src = get.my-src-tree;
+  };
+}
+```
+
+### `std`: A Proper Home for the Standard Library
 
 ```nix
 # utils/mod.nix

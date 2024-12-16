@@ -13,7 +13,7 @@ let
   stdFilter = import ./stdFilter.nix;
   toLowerCase = scopedImport rec {
     std = builtins;
-    mod = scopedImport { inherit std mod; } ../std/string/mod.nix;
+    mod = scopedImport { inherit mod std; } ../std/string/mod.nix;
   } ../std/string/toLowerCase.nix;
   stdToml = l.fromTOML (l.readFile (../. + "/std@.toml"));
   coreToml = l.fromTOML (l.readFile (../. + "/core@.toml"));
