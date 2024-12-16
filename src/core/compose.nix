@@ -135,6 +135,10 @@ let
               std = l.removeAttrs (extern // atom) [ "std" ];
             }
             {
+              _if = !__isStd__;
+              use = l.removeAttrs extern [ "std" ];
+            }
+            {
               _if = __internal__test;
               # information about the internal module system itself
               # available to tests
@@ -197,7 +201,7 @@ let
       # Base case: no module
       { };
 
-  atomScope = l.removeAttrs (extern // atom // { inherit extern; }) [
+  atomScope = l.removeAttrs atom [
     "atom"
     (baseNameOf par)
   ];
