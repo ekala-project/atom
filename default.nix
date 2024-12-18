@@ -1,1 +1,1 @@
-import ./src/core/mod.nix
+import ./atom-nix/core/mod.nix

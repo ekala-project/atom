@@ -1,14 +1,16 @@
-# Atom: Next-Gen Nix Module System
+# Elemental Nix
 
-> ⚠️ Warning: WIP Alpha ⚠️
+> ⚠️ Warning: Unstable API ⚠️
 
-Atom is a module system for Nix that enforces bounded code structures, enabling complete static analysis without evaluation. While standard Nix code requires full evaluation to understand its structure, Atom-based modules can be analyzed and reasoned about statically, allowing tools to make strong associations about code relationships and dependencies _before_ runtime.
+This Nix element provides a minimal, performant module system for Nix code which rigidly enforces code structure using familiar ergonomics.
 
-As a standalone tool, Atom provides immediate value to Nix users through its module system. It also serves as the foundation for the broader Ekala project, where its static analyzability enables powerful developer tooling such as LSPs or the [eka][eka] evaluation frontend. This will also enable efficient caching strategies previously infeasible in the Nix ecosystem.
+As a standalone tool, this element provides immediate value to Nix users through its module system. It is designed to serve as a foundational piece of the Ekala ecosystem of tooling, which aims to leverage Nix's unique idempotent properties at scale, providing a crucial layer to reason about our Nix code more efficiently than currently possible.
+
+The [`compose`](./core/compose.nix) entrypoint is designed as an efficient API to be fed programmatically from higher level tooling, primarily the `eka` CLI.
 
 ## Module Structure
 
-Modules in Atom are directories with a `mod.nix` file containing an attribute set, with subdirectories of the same structure forming submodules. Features include:
+Modules in a Nix element are directories with a `mod.nix` file containing an attribute set, with subdirectories of the same structure forming submodules. Features include:
 
 - **Explicit Scope**: All other `.nix` files in the module directory are implicitly imported as module members with their associated scope. Manual `import` is prohibited, ensuring a consistent global namespace.
 - **Predictable Composition**: _O(n)_ for shallow, _O(n \* log(m))_ for deep nesting.
@@ -104,26 +106,26 @@ args = [{}]
 
 ## Usage (Unstable)
 
-> #### ⚠️ [Implementation detail](./src/atom/importAtom.nix)
+> #### ⚠️ [Implementation detail](./atom-nix/atom/importAtom.nix)
 >
-> While it is conceptually useful to keep Atom minimal and in pure Nix, something like the code
+> While it is conceptually useful to keep the Nix element minimal and in pure Nix, something like the code
 > below should be implicit for user facing interfaces, e.g. [`eka`](https://github.com/ekala-project/eka).
 
 ```nix
 let
   atom = builtins.fetchGit "https://github.com/ekala-project/atom";
-  importAtom = import "${atom}/src/core/importAtom.nix";
+  importAtom = import "${atom}/atom-nix/core/importAtom.nix";
 in
 importAtom {
   features = [
     # enabled flags
   ];
-} ./src/dev.toml
+} ./atom-nix/dev.toml
 ```
 
 ## Future Directions: Ekala Platform
 
-Atom lays the groundwork for the Ekala platform, which builds upon the innovative store-based build and distribution model introduced by Nix.
+This element lays some of the groundwork for the Ekala platform, which builds upon the innovative store-based build and distribution model introduced by Nix.
 
 The Ekala project, through the `eka` CLI and its backend Eos API, aims to craft an open, unified platform that leverages the potential of this model to enhance software development, deployment, and system management at scale.
 
