@@ -56,11 +56,13 @@
 let
   l = builtins;
   core = import ./mod.nix;
+
 in
 {
   src,
   root,
   config,
+  system ? null,
   extern ? { },
   features ? [ ],
   # internal features of the composer function
@@ -77,6 +79,8 @@ let
     features = stdFeatures;
     inherit __internal__test;
   } (../. + "/std@.toml");
+
+  systemIsDefined = system != null;
 
   coreFeatures' = core.features.resolve core.coreToml.features coreFeatures;
   stdFeatures' = core.features.resolve core.stdToml.features stdFeatures;
@@ -133,6 +137,10 @@ let
             {
               _if = __isStd__;
               std = l.removeAttrs (extern // atom) [ "std" ];
+            }
+            {
+              _if = !__isStd__ && systemIsDefined;
+              inherit system;
             }
             {
               _if = !__isStd__;
