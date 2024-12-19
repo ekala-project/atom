@@ -16,6 +16,7 @@
   valid input (and the CLI should type check on it's end)
 */
 {
+  system ? null,
   features ? null,
   __internal__test ? false,
 }:
@@ -96,11 +97,12 @@ let
 in
 mod.compose {
   inherit
+    src
+    root
+    config
+    system
     extern
     __internal__test
-    config
-    root
-    src
     ;
   features = features';
   coreFeatures =
