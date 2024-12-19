@@ -1,5 +1,5 @@
 {
-  pkgs ? atom.pkgs,
+  pkgs ? use.pkgs,
 }:
 pkgs.mkShell {
   packages = with pkgs; [
