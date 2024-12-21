@@ -1,5 +1,5 @@
 let
-  f = import ../../src/core/importAtom.nix { __internal__test = true; };
+  f = import ../../atom-nix/core/importAtom.nix { __internal__test = true; };
 in
 {
   default = f (./. + "/default@.toml");

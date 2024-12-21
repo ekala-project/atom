@@ -1,132 +1,57 @@
-# Atom: Next-Gen Nix Module System
+# Atom: Efficient Decentralized Source Archive Format
 
-> ⚠️ Warning: WIP Alpha ⚠️
+Atom is a novel source archive format designed to make source-based builds exponentially more efficient at scale. It serves as the foundation for the Ekala ecosystem, introducing key optimizations learned from two decades of experience with Nix-style build systems.
 
-Atom is a module system for Nix that enforces bounded code structures, enabling complete static analysis without evaluation. While standard Nix code requires full evaluation to understand its structure, Atom-based modules can be analyzed and reasoned about statically, allowing tools to make strong associations about code relationships and dependencies _before_ runtime.
+## ⚠️ Development Status
 
-As a standalone tool, Atom provides immediate value to Nix users through its module system. It also serves as the foundation for the broader Ekala project, where its static analyzability enables powerful developer tooling such as LSPs or the [eka][eka] evaluation frontend. This will also enable efficient caching strategies previously infeasible in the Nix ecosystem.
+This project is in early development with unstable APIs. While we welcome collaboration from advanced users and potential contributors, the interfaces are subject to significant changes.
 
-## Module Structure
+## Key Features
 
-Modules in Atom are directories with a `mod.nix` file containing an attribute set, with subdirectories of the same structure forming submodules. Features include:
+**Smart Version Management**
 
-- **Explicit Scope**: All other `.nix` files in the module directory are implicitly imported as module members with their associated scope. Manual `import` is prohibited, ensuring a consistent global namespace.
-- **Predictable Composition**: _O(n)_ for shallow, _O(n \* log(m))_ for deep nesting.
-- **Direct Type Declaration**: Enables declaring code as its intended type without function wrappers. Enhances Nix's introspection capabilities, allowing complete Atom exploration in REPLs, while laying groundwork for future static analysis tooling.
-- **Public/Private Distinction**: Capitalized members denote public exports; all others are private by default.
-- **Static File Access**: `mod.outPath` provides access to non-Nix files, excluding submodules, offering an efficient file system API with a well-defined scope.
+- Stores versions without carrying full history
+- Quick and efficient version lookups
+- Minimal bandwidth usage when fetching specific versions
 
-These features collectively provide a structured, introspectable, and efficient module system that enhances code organization and maintainability in Nix projects, while remaining otherwise unopinionated.
+**Built for Decentralization**
 
-## A Module's Scope
+- Unique fingerprinting system combining repository history and package names
+- Self-contained identity verification without central authority
+- Seamless integration with existing open-source infrastructure
 
-### `mod`: Current Module
+**Efficient Repository Access**
 
-```nix
-# string/mod.nix
-{
-  ToLower = mod.toLowerCase;
-  Like = mod.like;
-}
+- Download only the parts you need
+- Bandwidth usage scales with actual requirements, not repository size
+- Optimized for distributed build networks
 
-# string/toLowerCase.nix: mod.toLowerCase
-str:
-let
-  head = std.substring 0 1 str;
-  tail = std.substring 1 (-1) str;
-in
-"${mod.ToLower head}${tail}"
-```
+## Components
 
-### `pre`: Parent Module Chain (Recursive)
+### [atom](https://github.com/ekala-project/eka/tree/master/crates/atom)
 
-```nix
-# parent/mod.nix
-{
-  privateHelper = x: x * 2;
-  PublicFunc = x: x + 1;
-}
+The core Rust library implementing the Atom format specification. Currently in active development with unstable APIs.
 
-# parent/child/mod.nix
-{
-  UseParentPrivate = x: pre.privateHelper x;
-  UseParentPublic = x: pre.PublicFunc x;
-}
-```
+### Elements
 
-### `atom`: Top-level and Dependencies
+Language-specific integrations that implement the Atom format:
 
-```nix
-# root/mod.nix
-{
-  RootFunc = x: x * 3;
-}
+#### [atom-nix](./atom-nix)
 
-# nested/deep/mod.nix
-{
-  UseRoot = x: atom.RootFunc x;
-}
-```
+The Nix element: a disciplined module system that enforces clear, introspectable boundaries.
 
-### `std`: Standard Library
+- Prevents common anti-patterns in Nix codebases
+- Enables static verification and optimization
+- Designed for predictable, efficient evaluation
+- Currently experimental with evolving interfaces
 
-```nix
-# utils/mod.nix
-{
-  Double = x: std.mul 2 x;
-  IsEven = x: std.mod x 2 == 0;
-}
-```
+## Project Goals
 
-## Eka's TOML Manifest (Unstable)
+Atom aims to solve fundamental inefficiencies in source-based build systems by:
 
-> #### ⚠️ The manifest's structure _will_ change as the project develops.
->
-> The current in-repo manifest implementation is for demonstration purposes only.
-> The canonical manifest validation layer exists in [`eka`](https://github.com/ekala-project/eka).
+- Creating clear, enforceable boundaries for code organization
+- Enabling intelligent optimization through static metadata and Nix's deterministic properties
+- Making version management fast and reliable in Nix's formal universe
+- Scaling decentralized source distribution efficiently
 
-Each atom is defined by a TOML manifest file, enhancing dependency tracking and separation of concerns:
-
-```toml
-[atom]
-name = "dev"
-version = "0.1.0"
-description = "Development environment"
-
-[features]
-default = []
-
-[fetch.pkgs]
-name = "nixpkgs"
-import = true
-args = [{}]
-```
-
-## Usage (Unstable)
-
-> #### ⚠️ [Implementation detail](./src/atom/importAtom.nix)
->
-> While it is conceptually useful to keep Atom minimal and in pure Nix, something like the code
-> below should be implicit for user facing interfaces, e.g. [`eka`](https://github.com/ekala-project/eka).
-
-```nix
-let
-  atom = builtins.fetchGit "https://github.com/ekala-project/atom";
-  importAtom = import "${atom}/src/core/importAtom.nix";
-in
-importAtom {
-  features = [
-    # enabled flags
-  ];
-} ./src/dev.toml
-```
-
-## Future Directions: Ekala Platform
-
-Atom lays the groundwork for the Ekala platform, which builds upon the innovative store-based build and distribution model introduced by Nix.
-
-The Ekala project, through the `eka` CLI and its backend Eos API, aims to craft an open, unified platform that leverages the potential of this model to enhance software development, deployment, and system management at scale.
-
-For details on `eka`, see the [eka README](https://github.com/ekala-project/eka/blob/master/README.md).
-
-For ongoing discussions and updates, visit our [Issues](https://github.com/ekala-project/atom/issues) page.
+For advanced users interested in contributing, please refer to the respective subdirectories for detailed technical documentation.

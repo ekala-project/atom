@@ -1,4 +1,4 @@
 let
-  dev = (import ./src/core/importAtom.nix) { } (./. + "/src/dev@.toml");
+  dev = (import ./atom-nix/core/importAtom.nix) { } (./. + "/atom-nix/dev@.toml");
 in
 dev.shell
