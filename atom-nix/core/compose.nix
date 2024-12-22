@@ -119,7 +119,6 @@ let
             __getEnv = errors.getEnv "";
             __getFlake = errors.import;
             get = extern;
-            std = if __isStd__ then atomScope else std;
           };
 
           scope'' = core.set.inject scope' [
@@ -127,6 +126,11 @@ let
             {
               _if = !__isStd__;
               atom = atomScope;
+              _else.std = atomScope;
+            }
+            {
+              _if = !__isStd__ && l.elem "std" coreFeatures';
+              inherit std;
             }
             {
               _if = __internal__test;

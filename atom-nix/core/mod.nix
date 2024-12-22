@@ -7,6 +7,12 @@ let
   importAtom = import ./importAtom.nix;
   fix = import ../std/fix.nix;
   when = scopedImport { std = builtins; } ../std/set/when.nix;
+  inject = scopedImport {
+    std = builtins;
+    mod = {
+      inherit when;
+    };
+  } ../std/set/inject.nix;
   filterMap = scopedImport { std = builtins; } ../std/set/filterMap.nix;
   make = scopedImport { std = builtins; } ../std/path/make.nix;
   parse = scopedImport { std = builtins; } ../std/file/parse.nix;
@@ -36,7 +42,7 @@ rec {
     inherit parse;
   };
   set = {
-    inherit when;
+    inherit when inject;
   };
 
   compose = import ./compose.nix;
@@ -81,8 +87,6 @@ rec {
       The following module does not evaluate to a valid attribute set:
              ${toString dir}/mod.nix
     '';
-
-  set.inject = l.foldl' (acc: x: acc // when x);
 
   pureBuiltinsForStd =
     std:
