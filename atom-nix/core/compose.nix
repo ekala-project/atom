@@ -60,12 +60,8 @@ in
 {
   src,
   root,
-  config,
+  cfg,
   extern ? { },
-  features ? [ ],
-  # internal features of the composer function
-  stdFeatures ? core.stdToml.features.default or [ ],
-  coreFeatures ? core.coreToml.features.default,
   # enable testing code paths
   __internal__test ? false,
   __isStd__ ? false,
@@ -73,25 +69,9 @@ in
 let
   par = (root + "/${src}");
 
-  std = core.importStd {
-    features = stdFeatures;
-    inherit __internal__test;
-  } (../. + "/std@.toml");
+  std = core.importStd { inherit __internal__test; } (../. + "/std@.toml");
 
-  coreFeatures' = core.features.resolve core.coreToml.features coreFeatures;
-  stdFeatures' = core.features.resolve core.stdToml.features stdFeatures;
-
-  cfg = config // {
-    features = config.features or { } // {
-      resolved = {
-        atom = features;
-        core = coreFeatures';
-        std = stdFeatures';
-      };
-    };
-  };
-
-  msg = core.errors.debugMsg config;
+  msg = core.errors.debugMsg cfg;
 
   f =
     f: pre: dir:
@@ -125,12 +105,11 @@ let
             preOpt
             {
               _if = !__isStd__;
-              atom = atomScope;
-              _else.std = atomScope;
-            }
-            {
-              _if = !__isStd__ && l.elem "std" coreFeatures';
+
               inherit std;
+              atom = atomScope;
+
+              _else.std = atomScope;
             }
             {
               _if = __internal__test;
@@ -206,10 +185,6 @@ let
     in
     core.set.inject fixed [
       ({ _if = __isStd__; } // core.pureBuiltinsForStd fixed)
-      {
-        _if = __isStd__ && l.elem "lib" cfg.features.resolved.atom;
-        inherit (extern) lib;
-      }
       {
         _if = __isStd__ && __internal__test;
         __internal = {

@@ -7,11 +7,6 @@ name = "nixpkgs"
 import = true
 args = [{}]
 
-[core]
-features = ["std"]
-[std]
-features = ["lib"]
-
 [backend.nix]
 # default when `eka` cli is ready
 # fetcher = "native"

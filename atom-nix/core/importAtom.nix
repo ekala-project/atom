@@ -16,8 +16,8 @@
   valid input (and the CLI should type check on it's end)
 */
 {
-  features ? null,
   __internal__test ? false,
+  __isStd__ ? false,
 }:
 path':
 let
@@ -26,22 +26,12 @@ let
   path = mod.prepDir path';
 
   file = builtins.readFile path;
-  config = builtins.fromTOML file;
-  atom = config.atom or { };
+  manifest = builtins.fromTOML file;
+  atom = manifest.atom or { };
   id = builtins.seq version (atom.id or (mod.errors.missingAtom path' "id"));
   version = atom.version or (mod.errors.missingAtom path' "version");
 
-  core = config.core or { };
-  std = config.std or { };
-
-  features' =
-    let
-      featSet = config.features or { };
-      featIn = if features == null then featSet.default or [ ] else features;
-    in
-    mod.features.resolve featSet featIn;
-
-  backend = config.backend or { };
+  backend = manifest.backend or { };
   nix = backend.nix or { };
 
   root = mod.prepDir (dirOf path);
@@ -55,7 +45,7 @@ let
   extern =
     let
       fetcher = nix.fetcher or "native"; # native doesn't exist yet
-      conf = config.fetcher or { };
+      conf = manifest.fetcher or { };
       f = conf.${fetcher} or { };
       root = f.root or "npins";
     in
@@ -82,37 +72,25 @@ let
             else
               src;
         in
-        if (v.optional or false && builtins.elem k features') || (!v.optional or false) then
-          { "${k}" = val; }
-        else
-          null
-      ) config.fetch or { }
+        {
+          "${k}" = val;
+        }
+      ) manifest.fetch or { }
     # else if fetcher = "native", etc
     else
       { };
-
-  meta = atom.meta or { };
 
 in
 mod.compose {
   inherit
     extern
     __internal__test
-    config
+    __isStd__
     root
     src
     ;
-  features = features';
-  coreFeatures =
-    let
-      feat = core.features or mod.coreToml.features.default;
-    in
-    mod.features.resolve mod.coreToml.features feat;
-  stdFeatures =
-    let
-      feat = std.features or mod.stdToml.features.default;
-    in
-    mod.features.resolve mod.stdToml.features feat;
 
-  __isStd__ = meta.__is_std__ or false;
+  cfg = {
+    inherit (manifest) atom;
+  };
 }

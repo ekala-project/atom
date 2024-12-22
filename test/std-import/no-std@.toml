@@ -1,6 +1,0 @@
-[atom]
-id = "no-std-test"
-version = "0.1.0"
-
-[core]
-features = [] # default is ["std"]
