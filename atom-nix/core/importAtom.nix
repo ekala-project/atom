@@ -16,14 +16,13 @@
   valid input (and the CLI should type check on it's end)
 */
 {
-  __internal__test ? false,
-  __isStd__ ? false,
+  cfg ? { },
 }:
 path':
 let
   mod = import ./mod.nix;
 
-  path = mod.prepDir path';
+  path = mod.prepPath path';
 
   file = builtins.readFile path;
   manifest = builtins.fromTOML file;
@@ -34,7 +33,7 @@ let
   backend = manifest.backend or { };
   nix = backend.nix or { };
 
-  root = mod.prepDir (dirOf path);
+  root = mod.prepPath (dirOf path);
   src = builtins.seq id (
     let
       file = mod.parse (baseNameOf path);
@@ -42,7 +41,7 @@ let
     in
     builtins.substring 0 (len - 1) file.name
   );
-  extern =
+  get =
     let
       fetcher = nix.fetcher or "native"; # native doesn't exist yet
       conf = manifest.fetcher or { };
@@ -63,7 +62,7 @@ let
                 builtins.foldl' (
                   f: x:
                   let
-                    intersect = x // (builtins.intersectAttrs x extern);
+                    intersect = x // (builtins.intersectAttrs x get);
                   in
                   if builtins.isAttrs x then f intersect else f x
                 ) (import src) v.args
@@ -80,17 +79,22 @@ let
     else
       { };
 
+  parsedCfg =
+    if builtins.isString cfg then
+      builtins.fromJSON cfg
+    else if builtins.isPath cfg then
+      builtins.fromJSON (builtins.readFile cfg)
+    else if builtins.isAttrs cfg then
+      cfg
+    else
+      mod.errors.warn "ignoring invalid config" { };
+
 in
 mod.compose {
-  inherit
-    extern
-    __internal__test
-    __isStd__
-    root
-    src
-    ;
+  inherit get;
 
-  cfg = {
+  root = root + "/${src}";
+  cfg = parsedCfg // {
     inherit (manifest) atom;
   };
 }

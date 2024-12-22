@@ -11,7 +11,7 @@
   GetFlake = !std ? getFlake && __getFlake;
   Std =
     let
-      xs = map (x: __internal.src.stdFilter x == null) (std.attrNames std);
+      xs = map (x: get.stdFilter x == null) (std.attrNames std);
     in
     std.elem false xs && abort "impure functions found";
 }
