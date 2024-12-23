@@ -1,16 +1,3 @@
 [atom]
 id = "dev"
 version = "0.2.0"
-
-[fetch.pkgs]
-name = "nixpkgs"
-import = true
-args = [{}]
-
-[backend.nix]
-# default when `eka` cli is ready
-# fetcher = "native"
-fetcher = "npins"
-
-[fetcher.npins]
-root = "npins"

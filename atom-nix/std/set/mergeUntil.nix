@@ -69,7 +69,9 @@ let
         f here values
     );
 in
-f [ ] [
-  rhs
-  lhs
-]
+f
+  [ ]
+  [
+    rhs
+    lhs
+  ]

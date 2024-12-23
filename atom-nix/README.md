@@ -107,10 +107,7 @@ name = "dev"
 version = "0.1.0"
 description = "Development environment"
 
-[fetch.pkgs]
-name = "nixpkgs"
-import = true
-args = [{}]
+# TODO
 ```
 
 ## Usage (Unstable)
