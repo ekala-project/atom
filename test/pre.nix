@@ -1,1 +1,1 @@
-(import ../atom-nix/core/importAtom.nix { }) (./. + "/pre@.toml")
+import ../atom-nix/core/importAtom.nix { path = ./pre; }

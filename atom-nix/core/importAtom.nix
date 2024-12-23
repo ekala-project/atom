@@ -17,30 +17,22 @@
 */
 {
   cfg ? { },
+  path,
 }:
-path':
 let
   mod = import ./mod.nix;
 
-  path = mod.prepPath path';
+  dir = mod.prepPath path;
 
-  file = builtins.readFile path;
+  file = builtins.readFile (dir + "@.toml");
   manifest = builtins.fromTOML file;
   atom = manifest.atom or { };
-  id = builtins.seq version (atom.id or (mod.errors.missingAtom path' "id"));
-  version = atom.version or (mod.errors.missingAtom path' "version");
+  id = builtins.seq version (atom.id or (mod.errors.missingAtom path "id"));
+  version = atom.version or (mod.errors.missingAtom path "version");
 
   backend = manifest.backend or { };
   nix = backend.nix or { };
 
-  root = mod.prepPath (dirOf path);
-  src = builtins.seq id (
-    let
-      file = mod.parse (baseNameOf path);
-      len = builtins.stringLength file.name;
-    in
-    builtins.substring 0 (len - 1) file.name
-  );
   get =
     let
       fetcher = nix.fetcher or "native"; # native doesn't exist yet
@@ -50,7 +42,7 @@ let
     in
     if fetcher == "npins" then
       let
-        pins = import (dirOf path + "/${root}");
+        pins = import (dirOf dir + "/${root}");
       in
       mod.filterMap (
         k: v:
@@ -93,7 +85,7 @@ in
 mod.compose {
   inherit get;
 
-  root = root + "/${src}";
+  root = builtins.seq id dir;
   cfg = parsedCfg // {
     inherit (manifest) atom;
   };

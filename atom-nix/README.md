@@ -125,7 +125,7 @@ let
   atom = builtins.fetchGit "https://github.com/ekala-project/atom";
   importAtom = import "${atom}/atom-nix/core/importAtom.nix";
 in
-importAtom { } ./atom-nix/dev.toml
+importAtom { path = ./atom-nix/dev; }
 ```
 
 ## Future Directions: Ekala Platform

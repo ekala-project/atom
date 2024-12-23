@@ -21,8 +21,6 @@ let
     std = builtins;
     mod = scopedImport { inherit mod std; } ../std/string/mod.nix;
   } ../std/string/toLowerCase.nix;
-  stdToml = l.fromTOML (l.readFile (../. + "/std@.toml"));
-  coreToml = l.fromTOML (l.readFile (../. + "/core@.toml"));
   pureBuiltinsForStd =
     std:
     filterMap (
@@ -53,8 +51,6 @@ rec {
     parse
     filterMap
     stdFilter
-    stdToml
-    coreToml
     ;
 
   path = {
@@ -102,7 +98,7 @@ rec {
   importStd =
     path:
     let
-      std = importAtom { } path;
+      std = importAtom { inherit path; };
     in
     std // pureBuiltinsForStd std;
 

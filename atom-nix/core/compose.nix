@@ -64,7 +64,7 @@ in
 }:
 let
 
-  std = core.importStd (../. + "/std@.toml");
+  std = core.importStd (../std);
 
   msg = core.errors.debugMsg cfg;
 
