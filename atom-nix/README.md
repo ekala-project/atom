@@ -107,13 +107,7 @@ name = "dev"
 version = "0.1.0"
 description = "Development environment"
 
-[features]
-default = []
-
-[fetch.pkgs]
-name = "nixpkgs"
-import = true
-args = [{}]
+# TODO
 ```
 
 ## Usage (Unstable)
@@ -128,11 +122,7 @@ let
   atom = builtins.fetchGit "https://github.com/ekala-project/atom";
   importAtom = import "${atom}/atom-nix/core/importAtom.nix";
 in
-importAtom {
-  features = [
-    # enabled flags
-  ];
-} ./atom-nix/dev.toml
+importAtom { path = ./atom-nix/dev; }
 ```
 
 ## Future Directions: Ekala Platform

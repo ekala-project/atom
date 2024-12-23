@@ -2,7 +2,3 @@
 id = "core"
 version = "0.3.0"
 description = "A purpose built, unopinionated, and performant module system for Nix code."
-
-[features]
-std = []
-default = ["std"]

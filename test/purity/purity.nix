@@ -1,8 +1,11 @@
 let
-  f = import ../../atom-nix/core/importAtom.nix;
-  atom = f { __internal__test = true; } (
-    # added to test implicit path conversion when path is a string
-    builtins.toPath (./. + "/test@.toml")
-  );
+  f = import ../../atom-nix/core/compose.nix;
+  atom = f {
+    get.stdFilter = import ../../atom-nix/core/stdFilter.nix;
+    cfg = { };
+    root =
+      # added to test implicit path conversion when path is a string
+      builtins.toPath ./test;
+  };
 in
 atom

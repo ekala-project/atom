@@ -21,8 +21,29 @@ let
     std = builtins;
     mod = scopedImport { inherit mod std; } ../std/string/mod.nix;
   } ../std/string/toLowerCase.nix;
-  stdToml = l.fromTOML (l.readFile (../. + "/std@.toml"));
-  coreToml = l.fromTOML (l.readFile (../. + "/core@.toml"));
+  pureBuiltinsForStd =
+    std:
+    filterMap (
+      builtin: f:
+      if stdFilter builtin != null then
+        null
+      else
+        {
+          ${builtin} =
+            if std ? ${builtin} then
+              if l.isAttrs std.${builtin} then
+                ## if std exports builtins named the same as a builtin funciton
+                ## such as `std.path`, then rexport std's version as a set
+                std.${builtin} // { __functor = _: f; }
+              else
+                ## if std's output is not an attribute set, prefer its version
+                std.${builtin}
+            else
+              ## re-export all non-conflicting builtins
+              f;
+        }
+    ) builtins;
+
 in
 rec {
   inherit
@@ -30,8 +51,6 @@ rec {
     parse
     filterMap
     stdFilter
-    stdToml
-    coreToml
     ;
 
   path = {
@@ -48,8 +67,6 @@ rec {
   compose = import ./compose.nix;
 
   errors = import ./errors.nix;
-
-  features = import ./features.nix;
 
   lowerKeys = filterMap (k: v: { ${toLowerCase k} = v; });
 
@@ -78,7 +95,12 @@ rec {
       );
     };
 
-  importStd = opts: importAtom { inherit (opts) __internal__test features; };
+  importStd =
+    path:
+    let
+      std = importAtom { inherit path; };
+    in
+    std // pureBuiltinsForStd std;
 
   modIsValid =
     mod: dir:
@@ -88,35 +110,12 @@ rec {
              ${toString dir}/mod.nix
     '';
 
-  pureBuiltinsForStd =
-    std:
-    filterMap (
-      builtin: f:
-      if stdFilter builtin != null then
-        null
-      else
-        {
-          ${builtin} =
-            if std ? ${builtin} then
-              if l.isAttrs std.${builtin} then
-                ## if std exports builtins named the same as a builtin funciton
-                ## such as `std.path`, then rexport std's version as a set
-                std.${builtin} // { __functor = _: f; }
-              else
-                ## if std's output is not an attribute set, prefer its version
-                std.${builtin}
-            else
-              ## re-export all non-conflicting builtins
-              f;
-        }
-    ) builtins;
-
   hasMod = contents: contents."mod.nix" or null == "regular";
 
   # It is crucial that the directory is a path literal, not a string
   # since the implicit copy to the /nix/store, which provides isolation,
   # only happens for path literals.
-  prepDir =
+  prepPath =
     dir:
     let
       dir' =

@@ -58,40 +58,15 @@ let
   core = import ./mod.nix;
 in
 {
-  src,
   root,
-  config,
-  extern ? { },
-  features ? [ ],
-  # internal features of the composer function
-  stdFeatures ? core.stdToml.features.default or [ ],
-  coreFeatures ? core.coreToml.features.default,
-  # enable testing code paths
-  __internal__test ? false,
-  __isStd__ ? false,
+  cfg,
+  get ? { },
 }:
 let
-  par = (root + "/${src}");
 
-  std = core.importStd {
-    features = stdFeatures;
-    inherit __internal__test;
-  } (../. + "/std@.toml");
+  std = core.importStd (../std);
 
-  coreFeatures' = core.features.resolve core.coreToml.features coreFeatures;
-  stdFeatures' = core.features.resolve core.stdToml.features stdFeatures;
-
-  cfg = config // {
-    features = config.features or { } // {
-      resolved = {
-        atom = features;
-        core = coreFeatures';
-        std = stdFeatures';
-      };
-    };
-  };
-
-  msg = core.errors.debugMsg config;
+  msg = core.errors.debugMsg cfg;
 
   f =
     f: pre: dir:
@@ -105,8 +80,13 @@ let
 
       scope =
         let
-          scope' = with core; {
-            inherit cfg;
+          static = with core; {
+            inherit
+              cfg
+              std
+              atom
+              get
+              ;
             mod = modScope;
             builtins = std;
             import = errors.import;
@@ -118,35 +98,10 @@ let
             __storePath = errors.storePath;
             __getEnv = errors.getEnv "";
             __getFlake = errors.import;
-            get = extern;
           };
 
-          scope'' = core.set.inject scope' [
-            preOpt
-            {
-              _if = !__isStd__;
-              atom = atomScope;
-              _else.std = atomScope;
-            }
-            {
-              _if = !__isStd__ && l.elem "std" coreFeatures';
-              inherit std;
-            }
-            {
-              _if = __internal__test;
-              # information about the internal module system itself
-              # available to tests
-              __internal = {
-                # a copy of the global scope, for testing if values exist
-                # for our internal testing functions
-                scope = scope'';
-                inherit __isStd__ __internal__test;
-                src = core;
-              };
-            }
-          ];
         in
-        scope'';
+        core.set.inject static [ preOpt ];
 
       Import = scopedImport scope;
 
@@ -164,7 +119,7 @@ let
           {
             ${file.name} =
               let
-                trace = core.errors.modPath par dir;
+                trace = core.errors.modPath root dir;
               in
               core.errors.context (msg "${trace}.${file.name}") member;
           }
@@ -183,7 +138,7 @@ let
               name = baseNameOf path;
             }
           );
-          trace = core.errors.modPath par dir;
+          trace = core.errors.modPath root dir;
         in
         assert core.modIsValid module dir;
         core.filterMap g contents // (core.errors.context (msg trace) module);
@@ -195,35 +150,6 @@ let
       # Base case: no module
       { };
 
-  atomScope = l.removeAttrs atom [
-    "atom"
-    (baseNameOf par)
-  ];
-
-  atom =
-    let
-      fixed = core.fix f null par;
-    in
-    core.set.inject fixed [
-      ({ _if = __isStd__; } // core.pureBuiltinsForStd fixed)
-      {
-        _if = __isStd__ && l.elem "lib" cfg.features.resolved.atom;
-        inherit (extern) lib;
-      }
-      {
-        _if = __isStd__ && __internal__test;
-        __internal = {
-          inherit __isStd__;
-        };
-      }
-    ];
+  atom = core.fix f null root;
 in
-assert
-  !__internal__test
-  # older versions of Nix don't have the `warn` builtin
-  || core.errors.warn ''
-    in ${toString ./default.nix}:
-    Internal testing functionality is enabled via the `__test` boolean.
-    This should never be `true` except in internal test runs.
-  '' true;
 atom

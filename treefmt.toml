@@ -20,4 +20,4 @@ excludes = []
 command = "prettier"
 options = ["--write"]
 includes = ["*.json", "*.md", "*.yaml", "*.yml"]
-excludes = ["*/sources.json"]
+excludes = ["*/sources.json", ".github/CODE_OF_CONDUCT.md"]
