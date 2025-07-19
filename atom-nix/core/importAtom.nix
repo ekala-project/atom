@@ -17,7 +17,9 @@
 */
 {
   features ? null,
+  remoteUrl ? null,
   __internal__test ? false,
+
 }:
 path':
 let
@@ -49,7 +51,7 @@ let
     in
     builtins.substring 0 (len - 1) file.name
   );
-  extern = import ./lock.nix root src;
+  extern = import ./lock.nix root src remoteUrl;
 
   meta = atom.meta or { };
 

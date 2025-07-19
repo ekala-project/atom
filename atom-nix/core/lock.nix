@@ -1,4 +1,4 @@
-root: src:
+root: src: url:
 let
   lockPath = "${root}/${src}.lock";
   lock = builtins.fromTOML (builtins.readFile lockPath);
@@ -11,7 +11,7 @@ if builtins.pathExists lockPath && lock.version == 1 then
         let
           path = "${root}/${dep.path or dep.id}@.toml";
         in
-        if dep ? version && dep ? id then
+        if dep.type == "atom" then
           if builtins.pathExists path then
             (import ./importAtom.nix) { } path
           else
@@ -22,17 +22,26 @@ if builtins.pathExists lockPath && lock.version == 1 then
               "${
                 (builtins.fetchGit {
                   inherit (dep) url rev;
-                  ref = "refs/atoms/${dep.id}/${dep.version}/atom";
+                  ref = "refs/eka/atoms/${dep.id}/${dep.version}";
                 })
               }/${spec}"
-        else if dep ? rev then
+        else if dep.type == "pin+git" then
           let
             repo = builtins.fetchGit {
-              inherit (dep) url rev;
+              inherit (dep) rev;
+              inherit url;
               shallow = true;
             };
           in
-          if dep ? path then import "${repo}/${dep.path}" else import repo
+          import (if dep ? path then "${repo}/${dep.path}" else repo)
+        else if dep.type == "pin" then
+          let
+            fetch = builtins.fetchurl {
+              inherit (dep) url;
+              sha256 = dep.checksum;
+            };
+          in
+          import (if dep ? path then "${fetch}/${dep.path}" else fetch)
         else
           { };
     }) lock.deps
