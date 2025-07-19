@@ -16,24 +16,32 @@ if builtins.pathExists lockPath && lock.version == 1 then
             (import ./importAtom.nix) { } path
           else
             let
-              spec = baseNameOf path;
+              manifest = baseNameOf path;
             in
             (import ./importAtom.nix) { }
               "${
-                (builtins.fetchGit {
+                (fetchGit {
                   inherit (dep) rev;
                   inherit url;
                   ref = "refs/eka/atoms/${dep.id}/${dep.version}";
                 })
-              }/${spec}"
+              }/${manifest}"
         else if dep.type == "pin+git" then
           let
-            repo = builtins.fetchGit {
+            repo = fetchGit {
               inherit (dep) rev url;
               shallow = true;
             };
           in
           import (if dep ? path then "${repo}/${dep.path}" else repo)
+        else if dep.type == "pin+tar" then
+          let
+            fetch = fetchTarball {
+              inherit (dep) url;
+              sha256 = dep.checksum;
+            };
+          in
+          import (if dep ? path then "${fetch}/${dep.path}" else fetch)
         else if dep.type == "pin" then
           let
             fetch = builtins.fetchurl {
