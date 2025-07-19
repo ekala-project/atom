@@ -41,9 +41,6 @@ let
     in
     mod.features.resolve featSet featIn;
 
-  backend = config.backend or { };
-  nix = backend.nix or { };
-
   root = mod.prepDir (dirOf path);
   src = builtins.seq id (
     let
@@ -52,83 +49,7 @@ let
     in
     builtins.substring 0 (len - 1) file.name
   );
-  extern =
-    let
-      fetcher = nix.fetcher or "native"; # native doesn't exist yet
-      conf = config.fetcher or { };
-      f = conf.${fetcher} or { };
-      fetchRoot = f.root or "npins";
-    in
-    if fetcher == "npins" then
-      let
-        pins = import (dirOf path + "/${fetchRoot}");
-      in
-      mod.filterMap (
-        k: v:
-        let
-          src = "${pins.${v.name or k}}/${v.subdir or ""}";
-          val =
-            if v.import or false then
-              if v.args or [ ] != [ ] then
-                builtins.foldl' (
-                  f: x:
-                  let
-                    intersect = x // (builtins.intersectAttrs x extern);
-                  in
-                  if builtins.isAttrs x then f intersect else f x
-                ) (import src) v.args
-              else
-                import src
-            else
-              src;
-        in
-        if (v.optional or false && builtins.elem k features') || (!v.optional or false) then
-          { "${k}" = val; }
-        else
-          null
-      ) config.fetch or { }
-    # else if fetcher = "native", etc
-    else
-      let
-        lockPath = "${root}/${src}.lock";
-        lock = builtins.fromTOML (builtins.readFile lockPath);
-      in
-      if builtins.pathExists lockPath && lock.version == 1 then
-        builtins.listToAttrs (
-          map (dep: {
-            name = dep.name or dep.id;
-            value =
-              let
-                path = "${root}/${dep.path or dep.id}@.toml";
-              in
-              if dep ? version && dep ? id then
-                if builtins.pathExists path then
-                  (import ./importAtom.nix) { } path
-                else
-                  let
-                    spec = baseNameOf path;
-                  in
-                  (import ./importAtom.nix) { }
-                    "${
-                      (builtins.fetchGit {
-                        inherit (dep) url rev;
-                        ref = "refs/atoms/${dep.id}/${dep.version}/atom";
-                      })
-                    }/${spec}"
-              else if dep ? rev then
-                let
-                  repo = builtins.fetchGit {
-                    inherit (dep) url rev;
-                    shallow = true;
-                  };
-                in
-                if dep ? path then import "${repo}/${dep.path}" else import repo
-              else
-                { };
-          }) lock.deps
-        )
-      else
-        { };
+  extern = import ./lock.nix root src;
 
   meta = atom.meta or { };
 
