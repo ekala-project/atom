@@ -21,15 +21,15 @@ if builtins.pathExists lockPath && lock.version == 1 then
             (import ./importAtom.nix) { }
               "${
                 (builtins.fetchGit {
-                  inherit (dep) url rev;
+                  inherit (dep) rev;
+                  inherit url;
                   ref = "refs/eka/atoms/${dep.id}/${dep.version}";
                 })
               }/${spec}"
         else if dep.type == "pin+git" then
           let
             repo = builtins.fetchGit {
-              inherit (dep) rev;
-              inherit url;
+              inherit (dep) rev url;
               shallow = true;
             };
           in
