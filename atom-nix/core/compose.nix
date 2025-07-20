@@ -105,20 +105,23 @@ let
 
       scope =
         let
-          scope' = with core; {
-            inherit cfg;
-            mod = modScope;
-            builtins = std;
-            import = errors.import;
-            scopedImport = errors.import;
-            __fetchurl = errors.fetch;
-            __currentSystem = errors.system;
-            __currentTime = errors.time 0;
-            __nixPath = errors.nixPath [ ];
-            __storePath = errors.storePath;
-            __getEnv = errors.getEnv "";
-            __getFlake = errors.import;
-          } // extern;
+          scope' =
+            with core;
+            {
+              inherit cfg;
+              mod = modScope;
+              builtins = std;
+              import = errors.import;
+              scopedImport = errors.import;
+              __fetchurl = errors.fetch;
+              __currentSystem = errors.system;
+              __currentTime = errors.time 0;
+              __nixPath = errors.nixPath [ ];
+              __storePath = errors.storePath;
+              __getEnv = errors.getEnv "";
+              __getFlake = errors.import;
+            }
+            // extern;
 
           scope'' = core.set.inject scope' [
             preOpt
