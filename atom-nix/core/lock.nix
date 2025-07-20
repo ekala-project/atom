@@ -65,11 +65,11 @@ if builtins.pathExists lockPath && lock.version == 1 then
     );
     get = builtins.listToAttrs (
       map (src: {
-        inherit (src) name;
+        name = src.pname or src.name;
         value =
           (builtins.removeAttrs src [ "type" ])
           // (
-            if src.type == "src" then
+            if src.type == "build" then
               {
                 src = import <nix/fetchurl.nix> {
                   inherit (src) url;
