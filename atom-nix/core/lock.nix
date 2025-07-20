@@ -50,6 +50,14 @@ if builtins.pathExists lockPath && lock.version == 1 then
             };
           in
           import (if dep ? path then "${fetch}/${dep.path}" else fetch)
+        else if dep.type == "src" then
+          let
+            src = import <nix/fetchurl.nix> {
+              inherit (dep) url;
+              hash = dep.checksum;
+            };
+          in
+            src
         else
           { };
     }) lock.deps
