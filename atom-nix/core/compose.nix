@@ -118,8 +118,7 @@ let
             __storePath = errors.storePath;
             __getEnv = errors.getEnv "";
             __getFlake = errors.import;
-            get = extern;
-          };
+          } // extern;
 
           scope'' = core.set.inject scope' [
             preOpt
