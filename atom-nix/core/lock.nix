@@ -13,20 +13,19 @@ let
     else
       let
         manifest = baseNameOf path;
-      in
-      "${
-        (fetchGit {
+        fetched = fetchGit {
           inherit (dep) rev;
           inherit url;
           ref = "refs/eka/atoms/${dep.id}/${dep.version}";
-        })
-      }/${manifest}";
+        };
+      in
+      "${fetched}/${manifest}";
 
   depsToSet =
     list:
     builtins.listToAttrs (
       map (dep: {
-        name = dep.name or dep.id;
+        name = dep.name or dep.id or "";
         value = dep;
       }) list
     );
@@ -51,9 +50,9 @@ let
       && fromDeps ? ${fromName}
       && builtins.match "^pin.*" fromDep.type != null
     then
-      builtins.traceVerbose "using a pin `${fromName}` as `${dep.name}` from atom `${dep.from}` in `${src}`" (
-        importDep (fromDep // { path = dep.path or fromDep.path or "."; })
-      )
+      builtins.traceVerbose
+        "using a pin `${fromName}` as `${dep.name}` from atom `${dep.from}` in `${src}`"
+        (importDep (fromDep // { path = dep.path or fromDep.path or "."; }))
     else
       import (if dep ? path then "${fetch}/${dep.path}" else fetch);
 
@@ -91,7 +90,7 @@ let
 in
 if builtins.pathExists lockPath && lock.version == 1 then
   let
-    from = builtins.mapAttrs (_: dep: importDep dep) deps;
+    from = builtins.mapAttrs (_: importDep) deps;
     get = builtins.listToAttrs (
       map (src: {
         name = src.pname or src.name;
