@@ -1,1 +1,4 @@
-{ Shell = mod.shell; }
+{
+  pkgs = from.nixpkgs { };
+  Shell = mod.shell;
+}
