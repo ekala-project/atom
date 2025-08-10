@@ -21,17 +21,17 @@
   __internal__test ? false,
 
 }:
-path':
+root':
 let
   mod = import ./mod.nix;
 
-  path = mod.prepDir path';
+  root = mod.prepDir root';
 
-  file = builtins.readFile path;
+  file = builtins.readFile (root + "/atom.toml");
   config = builtins.fromTOML file;
   atom = config.atom or { };
-  id = builtins.seq version (atom.id or (mod.errors.missingAtom path' "id"));
-  version = atom.version or (mod.errors.missingAtom path' "version");
+  id = builtins.seq version (atom.id or (mod.errors.missingAtom root' "id"));
+  version = atom.version or (mod.errors.missingAtom root' "version");
 
   core = config.core or { };
   std = config.std or { };
@@ -43,15 +43,7 @@ let
     in
     mod.features.resolve featSet featIn;
 
-  root = mod.prepDir (dirOf path);
-  src = builtins.seq id (
-    let
-      file = mod.parse (baseNameOf path);
-      len = builtins.stringLength file.name;
-    in
-    builtins.substring 0 (len - 1) file.name
-  );
-  extern = import ./lock.nix root src remoteUrl;
+  extern = import ./lock.nix root' id remoteUrl;
 
   meta = atom.meta or { };
 
@@ -62,7 +54,6 @@ mod.compose {
     __internal__test
     config
     root
-    src
     ;
   features = features';
   coreFeatures =

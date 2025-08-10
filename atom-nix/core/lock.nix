@@ -1,25 +1,24 @@
-root: src: url:
+root: id: url:
 let
-  lockPath = "${root}/${src}.lock";
+  lockPath = root + "/atom.lock";
   lock = builtins.fromTOML (builtins.readFile lockPath);
   importAtom = import ./importAtom.nix { };
   atomPath =
     dep:
     let
-      path = "${root}/${dep.path or dep.id}@.toml";
+      path = root + "/../${dep.path or dep.id}/atom.toml";
     in
     if builtins.pathExists path then
-      path
+      dirOf path
     else
       let
-        manifest = baseNameOf path;
         fetched = fetchGit {
           inherit (dep) rev;
           inherit url;
           ref = "refs/eka/atoms/${dep.id}/${dep.version}";
         };
       in
-      "${fetched}/${manifest}";
+      fetched;
 
   depsToSet =
     list:
@@ -38,7 +37,7 @@ let
       fromDeps = depsToSet fromLock.deps or [ ];
       fromAtom = deps.${dep.from};
       fromPath = atomPath fromAtom;
-      fromLockPath = "${(dirOf fromPath)}/${fromAtom.id}.lock";
+      fromLockPath = "${(fromPath)}/atom.lock";
       fromLock = builtins.fromTOML (builtins.readFile fromLockPath);
       fromName = dep.get or dep.name or "";
       fromDep = fromDeps.${fromName};
@@ -51,7 +50,7 @@ let
       && builtins.match "^pin.*" fromDep.type != null
     then
       builtins.traceVerbose
-        "using a pin `${fromName}` as `${dep.name}` from atom `${dep.from}` in `${src}`"
+        "using a pin `${fromName}` as `${dep.name}` from atom `${dep.from}` in `${id}`"
         (importDep (fromDep // { path = dep.path or fromDep.path or "."; }))
     else
       import (if dep ? path then "${fetch}/${dep.path}" else fetch);

@@ -58,7 +58,6 @@ let
   core = import ./mod.nix;
 in
 {
-  src,
   root,
   config,
   extern ? { },
@@ -71,12 +70,12 @@ in
   __isStd__ ? false,
 }:
 let
-  par = (root + "/${src}");
+  par = core.prepDir root;
 
   std = core.importStd {
     features = stdFeatures;
     inherit __internal__test;
-  } (../. + "/std@.toml");
+  } ../std;
 
   coreFeatures' = core.features.resolve core.coreToml.features coreFeatures;
   stdFeatures' = core.features.resolve core.stdToml.features stdFeatures;
