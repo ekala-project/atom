@@ -16,7 +16,6 @@
   valid input (and the CLI should type check on it's end)
 */
 {
-  features ? null,
   remoteUrl ? null,
   __internal__test ? false,
 
@@ -33,16 +32,6 @@ let
   id = builtins.seq version (atom.id or (mod.errors.missingAtom root' "id"));
   version = atom.version or (mod.errors.missingAtom root' "version");
 
-  core = config.core or { };
-  std = config.std or { };
-
-  features' =
-    let
-      featSet = config.features or { };
-      featIn = if features == null then featSet.default or [ ] else features;
-    in
-    mod.features.resolve featSet featIn;
-
   extern = import ./lock.nix root' id remoteUrl;
 
   meta = atom.meta or { };
@@ -55,17 +44,6 @@ mod.compose {
     config
     root
     ;
-  features = features';
-  coreFeatures =
-    let
-      feat = core.features or mod.coreToml.features.default;
-    in
-    mod.features.resolve mod.coreToml.features feat;
-  stdFeatures =
-    let
-      feat = std.features or mod.stdToml.features.default;
-    in
-    mod.features.resolve mod.stdToml.features feat;
 
   __isStd__ = meta.__is_std__ or false;
 }

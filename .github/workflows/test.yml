@@ -19,20 +19,6 @@ jobs:
       - uses: nixbuild/nix-quick-install-action@v28
       - name: Code Format Check
         run: eval "$(nix print-dev-env -f shell.nix)" && treefmt --fail-on-change
-  std-config:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: nixbuild/nix-quick-install-action@v28
-      - name: Std Library Config Test
-        run: cd test/std-import && ./import.sh > /dev/null
-  features:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: nixbuild/nix-quick-install-action@v28
-      - name: Feature Parsing Test
-        run: cd test/features && ./resolve.sh > /dev/null
   purity:
     runs-on: ubuntu-latest
     steps:

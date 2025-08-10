@@ -50,8 +50,6 @@ rec {
 
   errors = import ./errors.nix;
 
-  features = import ./features.nix;
-
   lowerKeys = filterMap (k: v: { ${toLowerCase k} = v; });
 
   collectPublic = filterMap (
@@ -79,7 +77,7 @@ rec {
       );
     };
 
-  importStd = opts: importAtom { inherit (opts) __internal__test features; };
+  importStd = opts: importAtom { inherit (opts) __internal__test; };
 
   modIsValid =
     mod: dir:
