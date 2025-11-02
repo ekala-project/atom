@@ -1,9 +1,0 @@
-[atom]
-id = "std"
-version = "0.2.0"
-description = "Nix Standard Library"
-
-[atom.meta]
-# special attribute
-# for the Nix std library
-__is_std__ = true
