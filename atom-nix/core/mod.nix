@@ -77,7 +77,12 @@ rec {
       );
     };
 
-  importStd = opts: importAtom { inherit (opts) __internal__test; };
+  importStd =
+    opts:
+    compose ../std {
+      inherit (opts) __internal__test;
+      __isStd__ = true;
+    };
 
   modIsValid =
     mod: dir:

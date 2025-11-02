@@ -29,20 +29,14 @@ let
   file = builtins.readFile (root + "/atom.toml");
   config = builtins.fromTOML file;
   atom = config.atom or { };
-  id = builtins.seq version (atom.id or (mod.errors.missingAtom root' "id"));
-  version = atom.version or (mod.errors.missingAtom root' "version");
-
-  extern = import ./lock.nix root' id remoteUrl;
 
   meta = atom.meta or { };
 
 in
-mod.compose {
+mod.compose root {
   inherit
-    extern
     __internal__test
     config
-    root
     ;
 
   __isStd__ = meta.__is_std__ or false;

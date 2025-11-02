@@ -57,8 +57,8 @@ let
   l = builtins;
   core = import ./mod.nix;
 in
+root:
 {
-  root,
   config,
   extern ? { },
   # enable testing code paths
@@ -70,7 +70,7 @@ let
 
   std = core.importStd {
     inherit __internal__test;
-  } ../std;
+  };
 
   cfg = config;
 
