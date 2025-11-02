@@ -32,18 +32,22 @@ This project is in early development with unstable APIs. While we welcome collab
 
 The core Rust library implementing the Atom format specification. Currently in active development with unstable APIs.
 
-### Elements
+### Composers
 
 Language-specific integrations that implement the Atom format:
 
 #### [atom-nix](./atom-nix)
 
-The Nix element: a disciplined module system that enforces clear, introspectable boundaries.
+A Nix composer: a disciplined module system that enforces clear, introspectable boundaries.
 
 - Prevents common anti-patterns in Nix codebases
 - Enables static verification and optimization
 - Designed for predictable, efficient evaluation
 - Currently experimental with evolving interfaces
+
+#### Compat composers
+
+Soon we will publish atom composers for backwards compatibility with legacy formats, such as flakes.
 
 ## Project Goals
 
