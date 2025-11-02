@@ -1,5 +1,5 @@
 [set]
-packages = []
+packages = ["atom-nix"]
 
 [metadata]
 tags = []
