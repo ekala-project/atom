@@ -1,4 +1,8 @@
 let
-  dev = (import ./atom-nix/core/importAtom.nix) { } (./atom-nix/dev);
+  core = import ./atom-nix/core/mod.nix;
+  dev = core.compose ./dev {
+    extern.from.nixpkgs = import <nixpkgs>;
+    config = { };
+  };
 in
 dev.shell
