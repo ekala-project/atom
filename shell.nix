@@ -1,6 +1,6 @@
 let
-  core = import ./atom-nix/core/mod.nix;
-  dev = core.compose ./dev {
+  compose = import ./atom-nix;
+  dev = compose ./dev {
     extern.from.nixpkgs = import <nixpkgs>;
     config = { };
   };
