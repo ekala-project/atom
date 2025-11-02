@@ -81,6 +81,7 @@ rec {
     opts:
     compose ../std {
       inherit (opts) __internal__test;
+      config = {};
       __isStd__ = true;
     };
 
