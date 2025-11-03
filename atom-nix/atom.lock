@@ -2,6 +2,6 @@
 # It is not intended for manual editing.
 version = 1
 
-[compose.as]
+[compose]
 use = "nix"
 entry = "."
