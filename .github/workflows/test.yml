@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+
+env:
+  NIX_PATH: nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz
+
 jobs:
   integrity:
     runs-on: ubuntu-latest
