@@ -21,9 +21,9 @@ in
 
   debugMsg =
     config: path:
-    "in ${config.atom.id}${if config.atom ? version then "-${config.atom.version}" else ""}${
-      if path == "" then "" else " at ${path}"
-    }";
+    "in ${config.package.label or "<anon>"}${
+      if config.package ? version then "-${config.package.version}" else ""
+    }${if path == "" then "" else " at ${path}"}";
 
   context = msg: value: l.traceVerbose msg value;
   modPath =
